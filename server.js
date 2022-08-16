@@ -29,8 +29,25 @@ async function testMetaApiSynchronization() {
           console.log(err)
     }
 } 
-testMetaApiSynchronization()
+//testMetaApiSynchronization()
+
+app.get('/positions',async (req,res) => {
+   try {
+      const account = await api.metatraderAccountApi.getAccount(accountId);
+      const connection = account.getStreamingConnection();
+      await connection.connect();
+      const terminalState = connection.terminalState;
+      await connection.waitSynchronized();
+      res.status(200).json({
+         "positions":terminalState.positions
+      })
+      console.log(terminalState.positions);
+   }   
+   catch(err) {
+         console.log(err)
+   }
+})
 
 app.listen(8000,() => {
-   console.log("Server running on port 8000")
+   console.log("Server running on port: 8000")
 })
