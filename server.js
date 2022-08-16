@@ -25,8 +25,8 @@ async function testMetaApiSynchronization() {
        await connection.waitSynchronized();
        console.log(terminalState.positions);
     }   
-    catch {
-
+    catch(err) {
+          console.log(err)
     }
 } 
 testMetaApiSynchronization()
