@@ -1,19 +1,22 @@
 
 const express = require('express')
 let MetaApi = require('metaapi.cloud-sdk').default;
+const { accessToken,accountId, port } = require('./config');
 
 
 const app = express()
 
 
-const token = 'nTCBftPwfyzUhUuHVzp6uDzC6jVLbJOSjctxna58nE5oMM16uDYEXLPwhPYIwGbb';
+//const token = 'nTCBftPwfyzUhUuHVzp6uDzC6jVLbJOSjctxna58nE5oMM16uDYEXLPwhPYIwGbb' || process.env.ACCOUNT_TOKEN;
+const token = {accessToken}
 const api = new MetaApi(token);
 
 
 
 
 
-let accountId = '6a103a80-5a6a-4097-8642-1c8fd47faf18';
+//let accountId = '6a103a80-5a6a-4097-8642-1c8fd47faf18' || process.env.ACCOUNT_ID ;
+let accountId = {accountId}
 
 async function testMetaApiSynchronization() {
   
@@ -48,6 +51,6 @@ app.get('/positions',async (req,res) => {
    }
 })
 
-app.listen(8000,() => {
+app.listen({port},() => {
    console.log("Server running on port: 8000")
 })
