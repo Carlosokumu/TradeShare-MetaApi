@@ -16,12 +16,12 @@ const api = new MetaApi(token);
 
 
 //let accountId = '6a103a80-5a6a-4097-8642-1c8fd47faf18' || process.env.ACCOUNT_ID ;
-let accountId = {accountId}
+//let accountId = {accountId}
 
 async function testMetaApiSynchronization() {
   
     try {
-       const account = await api.metatraderAccountApi.getAccount(accountId);
+       const account = await api.metatraderAccountApi.getAccount({accountId});
        const connection = account.getStreamingConnection();
        await connection.connect();
        const terminalState = connection.terminalState;
@@ -36,7 +36,7 @@ async function testMetaApiSynchronization() {
 
 app.get('/positions',async (req,res) => {
    try {
-      const account = await api.metatraderAccountApi.getAccount(accountId);
+      const account = await api.metatraderAccountApi.getAccount({accountId});
       const connection = account.getStreamingConnection();
       await connection.connect();
       const terminalState = connection.terminalState;
