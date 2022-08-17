@@ -1,22 +1,25 @@
 
 const express = require('express')
 let MetaApi = require('metaapi.cloud-sdk').default;
-const { accessToken,accountId, port } = require('./config');
+
 
 
 const app = express()
 
 
-//const token = 'nTCBftPwfyzUhUuHVzp6uDzC6jVLbJOSjctxna58nE5oMM16uDYEXLPwhPYIwGbb' || process.env.ACCOUNT_TOKEN;
-const token = {accessToken}
+//Environment variables
+const token = process.env.ACCOUNT_TOKEN
+let accountId = process.env.ACCOUNT_ID ;
+
+
 const api = new MetaApi(token);
 
 
 
 
 
-//let accountId = '6a103a80-5a6a-4097-8642-1c8fd47faf18' || process.env.ACCOUNT_ID ;
-//let accountId = {accountId}
+
+
 
 async function testMetaApiSynchronization() {
   
@@ -36,7 +39,7 @@ async function testMetaApiSynchronization() {
 
 app.get('/positions',async (req,res) => {
    try {
-      const account = await api.metatraderAccountApi.getAccount({accountId});
+      const account = await api.metatraderAccountApi.getAccount(accountId);
       const connection = account.getStreamingConnection();
       await connection.connect();
       const terminalState = connection.terminalState;
