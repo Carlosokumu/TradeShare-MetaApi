@@ -51,6 +51,6 @@ app.get('/positions',async (req,res) => {
    }
 })
 
-app.listen({port},() => {
+app.listen(process.env.PORT,() => {
    console.log("Server running on port: 8000")
 })
