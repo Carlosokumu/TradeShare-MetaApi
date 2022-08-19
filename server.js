@@ -21,21 +21,7 @@ const api = new MetaApi(token);
 
 
 
-async function testMetaApiSynchronization() {
-  
-    try {
-       const account = await api.metatraderAccountApi.getAccount({accountId});
-       const connection = account.getStreamingConnection();
-       await connection.connect();
-       const terminalState = connection.terminalState;
-       await connection.waitSynchronized();
-       console.log(terminalState.positions);
-    }   
-    catch(err) {
-          console.log(err)
-    }
-} 
-//testMetaApiSynchronization()
+//Fetch all the currently running positions from the mt4 account
 
 app.get('/positions',async (req,res) => {
    try {
@@ -48,6 +34,20 @@ app.get('/positions',async (req,res) => {
          "positions":terminalState.positions
       })
       console.log(terminalState.positions);
+   }   
+   catch(err) {
+         console.log(err)
+   }
+})
+
+app.get('/account',async (req,res) => {
+   try {
+      const account = await api.metatraderAccountApi.getAccount(accountId);
+      const connection = account.getStreamingConnection();
+      await connection.connect();
+      const terminalState = connection.terminalState;
+      await connection.waitSynchronized();
+      res.status(200).json(terminalState.accountInformation)
    }   
    catch(err) {
          console.log(err)
