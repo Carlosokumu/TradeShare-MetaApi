@@ -47,6 +47,7 @@ app.get('/account',async (req,res) => {
       await connection.connect();
       const terminalState = connection.terminalState;
       await connection.waitSynchronized();
+      console.log(terminalState.accountInformation)
       res.status(200).json(terminalState.accountInformation)
    }   
    catch(err) {
