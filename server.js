@@ -36,7 +36,7 @@ app.get('/positions',async (req,res) => {
       console.log(terminalState.positions);
    }   
    catch(err) {
-         console.log(err)
+         console.log("FETCHERROR",err)
    }
 })
 
