@@ -55,7 +55,7 @@ app.get('/account',async (req,res) => {
    }
 })
 
-app.get("/history",async (res,req) => {
+app.get("/history",async (req,res) => {
    startTime = "2020-09-10 15:00:00.000"
    endTime = "2020-10-10 15:00:00.000"
 
