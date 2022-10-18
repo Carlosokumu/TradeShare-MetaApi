@@ -65,7 +65,8 @@ app.get("/history",async (res,req) => {
 
     await connection.connect();
     await connection.waitSynchronized();
-   res.json(await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), new Date()))
+    const orders = await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), new Date())
+     res.status(200).json({"orders" : orders})
 })
 
 app.listen(process.env.PORT,() => {
