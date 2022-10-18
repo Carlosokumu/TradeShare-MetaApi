@@ -60,11 +60,11 @@ app.get("/history",async (res,req) => {
    endTime = "2020-10-10 15:00:00.000"
 
    const account = await api.metatraderAccountApi.getAccount(accountId);
-   const connection = account.getStreamingConnection();
-   await connection.connect();
-  // const terminalState = connection.terminalState;
- 
-   await connection.waitSynchronized();
+
+   const connection = account.getRPCConnection();
+
+    await connection.connect();
+    await connection.waitSynchronized();
    res.json(await connection.getHistoryOrdersByTimeRange(startTime, endTime))
 })
 
