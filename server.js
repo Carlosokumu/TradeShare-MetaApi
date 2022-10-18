@@ -55,6 +55,19 @@ app.get('/account',async (req,res) => {
    }
 })
 
+app.get("/history",async (res,req) => {
+   startTime = "2020-09-10 15:00:00.000"
+   endTime = "2020-10-10 15:00:00.000"
+
+   const account = await api.metatraderAccountApi.getAccount(accountId);
+   const connection = account.getStreamingConnection();
+   await connection.connect();
+  // const terminalState = connection.terminalState;
+ 
+   await connection.waitSynchronized();
+   res.json(await connection.getHistoryOrdersByTimeRange(startTime, endTime))
+})
+
 app.listen(process.env.PORT,() => {
    console.log("Server running on port: 8000")
 })
