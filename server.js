@@ -71,7 +71,7 @@ app.get("/history",async (req,res) => {
 
 
 app.post("/mt4info",(req,res) => {
-   console("MT4 Posting data....")
+   console.log("MT4 Posting data....")
    console.log(req.body)
 })
 
