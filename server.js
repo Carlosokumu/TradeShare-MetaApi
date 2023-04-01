@@ -1,6 +1,7 @@
 
 const express = require('express')
 let MetaApi = require('metaapi.cloud-sdk').default;
+const bodyParser = require('body-parser');
 
 
 
@@ -15,6 +16,9 @@ let accountId = process.env.ACCOUNT_ID ;
 const api = new MetaApi(token);
 
 
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 
 
