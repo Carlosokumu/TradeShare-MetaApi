@@ -69,6 +69,12 @@ app.get("/history",async (req,res) => {
      res.status(200).json({"orders" : orders})
 })
 
+
+app.get("/mt4info",(req,res) => {
+   console("MT4 Posting data....")
+   console.log(req.body)
+})
+
 app.listen(process.env.PORT,() => {
    console.log("Server running on port: 8000")
 })
