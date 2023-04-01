@@ -73,6 +73,9 @@ app.get("/history",async (req,res) => {
 app.post("/mt4info",(req,res) => {
    console.log("MT4 Posting data....")
    console.log(req.body)
+   res.status(200).send("Link")
+
+
 })
 
 app.listen(process.env.PORT,() => {
