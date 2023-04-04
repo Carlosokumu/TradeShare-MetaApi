@@ -46,6 +46,7 @@ const initializeOrders = async() => {
      var orders = [];
      for(var x = 0; x < (terminalState.positions.length - 1); x++) {
                var orderinfo = new OrderInfo();
+               orderinfo._id = new mongoose.Types.ObjectId();
                orderinfo.ticketId = terminalState.positions[x].id;
                orderinfo.profit = terminalState.positions[x].profit
                orders.push(orderinfo); 
