@@ -50,8 +50,6 @@ const initializeOrders = async() => {
                orderinfo.profit = terminalState.positions.profit
                orders.push(orderinfo); 
       } 
-
-      OrderInfo.drop()
       OrderInfo.create(orders, (err) => {
          if (err) {
             console.log("Error initializing orders")
