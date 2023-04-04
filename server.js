@@ -25,9 +25,10 @@ const connectDB = async () => {
         conn = await mongoose.connect(DATABASE_URL,{
             useNewUrlParser: true,
             useUnifiedTopology: true,
-        });
-        conn.db.listCollections()
+        }).then(client => {
 
+         console.log(client.db.getCollectionNames())
+        });
         console.log('MongoDB connected!!');
     } catch (err) {
         console.log('Failed to connect to MongoDB', err);
@@ -53,12 +54,12 @@ const initializeOrders = async() => {
                orders.push(orderinfo); 
       } 
      
-      OrderInfo.create(orders).then((result) => {
-         console.log("Created Orders Successfully:",result.length)
-       })
-       .catch((err) => {
-         console.log("Failed to Create Orders:",err)
-       })
+      // OrderInfo.create(orders).then((result) => {
+      //    console.log("Created Orders Successfully:",result.length)
+      //  })
+      //  .catch((err) => {
+      //    console.log("Failed to Create Orders:",err)
+      //  })
    }   
    catch(err) {
          console.log("Failed to connect to Trading account:",err)
