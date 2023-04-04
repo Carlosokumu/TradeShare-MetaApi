@@ -46,8 +46,8 @@ const initializeOrders = async() => {
      var orders = [];
      for(var x = 0; x < (terminalState.positions.length - 1); x++) {
                var orderinfo = new OrderInfo();
-               orderinfo.ticketId = terminalState.positions[i].id;
-               orderinfo.profit = terminalState.positions[i].profit
+               orderinfo.ticketId = terminalState.positions[x].id;
+               orderinfo.profit = terminalState.positions[x].profit
                orders.push(orderinfo); 
       } 
       OrderInfo.create(orders).then((result) => {
