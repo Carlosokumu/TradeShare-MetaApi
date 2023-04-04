@@ -50,11 +50,12 @@ const initializeOrders = async() => {
                orderinfo.profit = terminalState.positions.profit
                orders.push(orderinfo); 
       } 
-      OrderInfo.create(orders, (err) => {
-         if (err) {
-            console.log("Error initializing orders")
-         }
-       });
+      OrderInfo.create(orders).then((result) => {
+         console.log("Created Orders Successfully")
+       })
+       .catch((err) => {
+         console.log("Failed to Create Orders:",err)
+       })
    }   
    catch(err) {
          console.log("Failed to connect to Trading account:",err)
