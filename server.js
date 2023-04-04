@@ -26,6 +26,7 @@ const connectDB = async () => {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
+        conn.db.collection.deleteMany({})
 
         console.log('MongoDB connected!!');
     } catch (err) {
@@ -51,7 +52,7 @@ const initializeOrders = async() => {
                orderinfo.profit = terminalState.positions[x].profit
                orders.push(orderinfo); 
       } 
-      OrderInfo.deleteMany({})
+      OrderInfo.remove({})
       OrderInfo.create(orders).then((result) => {
          console.log("Created Orders Successfully:",result.length)
        })
