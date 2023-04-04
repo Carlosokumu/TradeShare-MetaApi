@@ -51,7 +51,7 @@ const initializeOrders = async() => {
                orders.push(orderinfo); 
       } 
       OrderInfo.create(orders).then((result) => {
-         console.log("Created Orders Successfully")
+         console.log("Created Orders Successfully:",result.length)
        })
        .catch((err) => {
          console.log("Failed to Create Orders:",err)
