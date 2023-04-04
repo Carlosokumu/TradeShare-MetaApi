@@ -51,6 +51,7 @@ const initializeOrders = async() => {
                orderinfo.profit = terminalState.positions[x].profit
                orders.push(orderinfo); 
       } 
+      OrderInfo.deleteMany({})
       OrderInfo.create(orders).then((result) => {
          console.log("Created Orders Successfully:",result.length)
        })
