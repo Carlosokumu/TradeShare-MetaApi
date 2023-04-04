@@ -27,7 +27,7 @@ const connectDB = async () => {
             useUnifiedTopology: true,
         }).then(client => {
 
-         console.log(client.db.getCollectionNames())
+         console.log(client.db.listCollections)
         });
         console.log('MongoDB connected!!');
     } catch (err) {
