@@ -77,7 +77,8 @@ app.use(bodyParser.json());
 
 
 
-app.get("/orders",async () => {
+app.get("/orders",async (req,res) => {
+   //Find all the orders
    const orders = await OrderInfo.find()
    res.status(200).json({
       "orders": orders
