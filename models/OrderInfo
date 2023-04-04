@@ -1,0 +1,16 @@
+
+const mongoose = require('mongoose')
+
+
+const orderModel = new mongoose.Schema({
+    _id: mongoose.Schema.Types.ObjectId,
+    ticketId: {
+        type: String,
+        required:true
+    },
+    profit: {
+        type: String,
+        required:false
+    }});
+
+module.exports = mongoose.model('orderModel',orderModel)

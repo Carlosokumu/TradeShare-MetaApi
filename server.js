@@ -2,18 +2,73 @@
 const express = require('express')
 let MetaApi = require('metaapi.cloud-sdk').default;
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const OrderInfo = require('./models/OrderInfo');
+
+
+
+
+let conn
+
+//Environment variables
+const token = process.env.ACCOUNT_TOKEN
+let accountId = process.env.ACCOUNT_ID 
+const DATABASE_URL = process.env.DATABASE_URL
+
+
+const api = new MetaApi(token);
+
+
+//mongoose connection to the databases
+const connectDB = async () => {
+    try {
+        conn = await mongoose.connect(DATABASE_URL,{
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+
+        console.log('MongoDB connected!!');
+    } catch (err) {
+        console.log('Failed to connect to MongoDB', err);
+    }
+};
+connectDB()
+
+
+const initializeOrders = async() => {
+
+   try {
+      const account = await api.metatraderAccountApi.getAccount(accountId);
+      const connection = account.getStreamingConnection();
+      await connection.connect();
+      const terminalState = connection.terminalState;
+      await connection.waitSynchronized();
+     var orders = [];
+     for(var x = 0; x < (terminalState.positions.length - 1); x++) {
+               var orderinfo = new OrderInfo();
+               orderinfo.ticketId = terminalState.positions.id;
+               orderinfo.profit = terminalState.positions.profit
+               orders.push(orderinfo); 
+      } 
+
+      OrderInfo.drop()
+      OrderInfo.create(orders, (err) => {
+         if (err) {
+            console.log("Error initializing orders")
+         }
+       });
+   }   
+   catch(err) {
+         console.log("Failed to connect to Trading account:",err)
+   }
+}
+initializeOrders()
 
 
 
 const app = express()
 
 
-//Environment variables
-const token = process.env.ACCOUNT_TOKEN
-let accountId = process.env.ACCOUNT_ID ;
-
-
-const api = new MetaApi(token);
 
 
 
@@ -22,10 +77,15 @@ app.use(bodyParser.json());
 
 
 
+app.get("/orders",async () => {
+   const orders = await OrderInfo.find()
+   res.status(200).json({
+      "orders": orders
+   })
+})
 
 
 
-//Fetch all the currently running positions from the mt4 account
 
 app.get('/positions',async (req,res) => {
    try {
