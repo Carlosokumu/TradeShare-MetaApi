@@ -45,10 +45,10 @@ const initializeOrders = async() => {
 
    try {
       const account = await api.metatraderAccountApi.getAccount(accountId);
-      const connection = account.getStreamingConnection();
+      const connection = account.getRPCConnection();
       await connection.connect();
-      const terminalState = connection.terminalState;
       await connection.waitSynchronized();
+
       const trades = await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), new Date())
 
      var orders = [];
