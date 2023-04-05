@@ -49,23 +49,21 @@ const initializeOrders = async() => {
       await connection.connect();
       await connection.waitSynchronized();
 
-      const trades = await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), new Date()).then( tradedata => {
+
+      var orders = [];
+
+      await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), new Date()).then( tradedata => {
          console.log(tradedata)
+         var orderinfo = new OrderInfo();
+         orderinfo._id = new mongoose.Types.ObjectId();
+         orderinfo.ticketId = tradedata.id;
+         orderinfo.profit = tradedata.profit
+         orders.push(orderinfo); 
       }
 
       ).catch(err => {
 
-      })
-
-     var orders = [];
-     for(var x = 0; x < (trades.length - 1); x++) {
-               var orderinfo = new OrderInfo();
-               orderinfo._id = new mongoose.Types.ObjectId();
-               orderinfo.ticketId = trades[x].id;
-               orderinfo.profit = trades[x].profit
-               orders.push(orderinfo); 
-      } 
-     
+      })  
       OrderInfo.create(orders).then((result) => {
          console.log("Created Orders Successfully:",result.length)
        })
