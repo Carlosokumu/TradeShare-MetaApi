@@ -8,7 +8,7 @@ const OrderInfo = require('./models/OrderInfo');
 
 
 
-let conn
+
 
 //Environment variabless
 const token = process.env.ACCOUNT_TOKEN
@@ -52,17 +52,19 @@ const initializeOrders = async() => {
 
       var orders = [];
 
-      await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), new Date()).then( tradedata => {
-         console.log(tradedata.id)
-         var orderinfo = new OrderInfo();
-         orderinfo._id = new mongoose.Types.ObjectId();
-         orderinfo.ticketId = tradedata.id;
-         orderinfo.profit = tradedata.profit
-         orders.push(orderinfo); 
+      await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), new Date()).then(tradedata => {
+         for (var i = 0; i < tradedata.historyOrders.length; i++) {
+            var orderinfo = new OrderInfo();
+            orderinfo._id = new mongoose.Types.ObjectId();
+            orderinfo.ticketId = tradedata.id;
+            orderinfo.profit = tradedata.profit
+            orders.push(orderinfo); 
+        }
+         
       }
 
       ).catch(err => {
-
+           console.log("error getting orders:",err)
       })  
       OrderInfo.create(orders).then((result) => {
          console.log("Created Orders Successfully:",result.length)
