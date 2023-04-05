@@ -40,6 +40,7 @@ const connectDB = async () => {
 connectDB()
 
 
+//We  initialize trading history for the last 30 days from Metatrader.
 const initializeOrders = async() => {
 
    try {
@@ -48,12 +49,14 @@ const initializeOrders = async() => {
       await connection.connect();
       const terminalState = connection.terminalState;
       await connection.waitSynchronized();
+      const trades = await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), new Date())
+
      var orders = [];
-     for(var x = 0; x < (terminalState.positions.length - 1); x++) {
+     for(var x = 0; x < (trades.length - 1); x++) {
                var orderinfo = new OrderInfo();
                orderinfo._id = new mongoose.Types.ObjectId();
-               orderinfo.ticketId = terminalState.positions[x].id;
-               orderinfo.profit = terminalState.positions[x].profit
+               orderinfo.ticketId = trades[x].id;
+               orderinfo.profit = trades[x].profit
                orders.push(orderinfo); 
       } 
      
