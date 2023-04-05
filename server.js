@@ -49,7 +49,13 @@ const initializeOrders = async() => {
       await connection.connect();
       await connection.waitSynchronized();
 
-      const trades = await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), new Date())
+      const trades = await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), new Date()).then( tradedata => {
+         console.log(tradedata.length)
+      }
+
+      ).catch(err => {
+
+      })
 
      var orders = [];
      for(var x = 0; x < (trades.length - 1); x++) {
