@@ -56,8 +56,8 @@ const initializeOrders = async() => {
          for (var i = 0; i < tradedata.historyOrders.length; i++) {
             var orderinfo = new OrderInfo();
             orderinfo._id = new mongoose.Types.ObjectId();
-            orderinfo.ticketId = tradedata.id;
-            orderinfo.profit = tradedata.profit
+            orderinfo.ticketId = tradedata.historyOrders[i].id;
+            orderinfo.profit = tradedata.historyOrders[i].profit
             orders.push(orderinfo); 
         }
          
