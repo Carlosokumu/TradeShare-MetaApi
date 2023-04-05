@@ -50,7 +50,7 @@ const initializeOrders = async() => {
       await connection.waitSynchronized();
 
       const trades = await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), new Date()).then( tradedata => {
-         console.log(tradedata.length)
+         console.log(tradedata)
       }
 
       ).catch(err => {
