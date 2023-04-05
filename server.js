@@ -53,7 +53,7 @@ const initializeOrders = async() => {
       var orders = [];
 
       await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), new Date()).then( tradedata => {
-         console.log(tradedata)
+         console.log(tradedata.id)
          var orderinfo = new OrderInfo();
          orderinfo._id = new mongoose.Types.ObjectId();
          orderinfo.ticketId = tradedata.id;
