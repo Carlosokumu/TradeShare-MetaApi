@@ -19,7 +19,7 @@ const DATABASE_URL = process.env.DATABASE_URL
 const api = new MetaApi(token);
 
 
-//mongoose connection to the databases
+//mongoose connection to the database
 const connectDB = async () => {
     try {
          await mongoose.connect(DATABASE_URL,{
@@ -136,7 +136,7 @@ app.get("/history",async (req,res) => {
 
     await connection.connect();
     await connection.waitSynchronized();
-    const orders = await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), new Date())
+    const orders = await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), new Date())
      res.status(200).json({"orders" : orders})
 })
 
