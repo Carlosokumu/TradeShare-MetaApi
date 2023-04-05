@@ -10,7 +10,7 @@ const OrderInfo = require('./models/OrderInfo');
 
 let conn
 
-//Environment variables
+//Environment variabless
 const token = process.env.ACCOUNT_TOKEN
 let accountId = process.env.ACCOUNT_ID 
 const DATABASE_URL = process.env.DATABASE_URL
@@ -22,20 +22,21 @@ const api = new MetaApi(token);
 //mongoose connection to the databases
 const connectDB = async () => {
     try {
-        conn = await mongoose.connect(DATABASE_URL,{
+         await mongoose.connect(DATABASE_URL,{
             useNewUrlParser: true,
             useUnifiedTopology: true,
         }).then(client => {
-         console.log('MongoDB connected!!');
-         client.connection.listCollections().toArray((error, collections) => { 
-                  console.log(collections)
-          })
-         
+         console.log('MongoDB connected!!'); 
+         client.connections[0].collection("ordermodels").deleteMany({})
         });
     } catch (err) {
         console.log('Failed to connect to MongoDB', err);
     }
 };
+
+
+
+
 connectDB()
 
 
@@ -56,12 +57,12 @@ const initializeOrders = async() => {
                orders.push(orderinfo); 
       } 
      
-      // OrderInfo.create(orders).then((result) => {
-      //    console.log("Created Orders Successfully:",result.length)
-      //  })
-      //  .catch((err) => {
-      //    console.log("Failed to Create Orders:",err)
-      //  })
+      OrderInfo.create(orders).then((result) => {
+         console.log("Created Orders Successfully:",result.length)
+       })
+       .catch((err) => {
+         console.log("Failed to Create Orders:",err)
+       })
    }   
    catch(err) {
          console.log("Failed to connect to Trading account:",err)
