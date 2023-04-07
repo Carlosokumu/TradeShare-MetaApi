@@ -155,7 +155,7 @@ app.post("/mt4info",(req,res) => {
    // for(var myKey in req.body) {
    //    console.log("key:"+myKey);
    // }
-   for(var attributename in req.body){
+   for(var attributename in req.body.keys()){
       console.log(req.body[attributename]);
   }
    console.log("MT4 Posting data....")
