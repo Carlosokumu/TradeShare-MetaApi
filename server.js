@@ -153,7 +153,7 @@ app.get("/history",async (req,res) => {
 app.post("/mt4info",(req,res) => {
   // var jsonObj = JSON.parse(req.body);
    for(var myKey in req.body) {
-      console.log("key:"+myKey+", value:"+myJson[myKey]);
+      console.log("key:"+myKey);
    }
    console.log("MT4 Posting data....")
    console.log(req.body)
