@@ -168,12 +168,12 @@ app.post("/mt4info",(req,res) => {
 
    console.log("MT4 Posting data....")
    console.log(isJsonString(req.body))
-   let options = { useFindAndModify: false, new: true }
    var x = req.body
    var stringdata = JSON.stringify(req.body)
    var data = JSON.parse(stringdata)
    console.log(data)
    Object.keys(x).forEach(function(key) {
+      let options = { useFindAndModify: false, new: true }
       console.log('Key : ' + key + ', Value : ' + x[key])
       OrderInfo.findOneAndUpdate({ tokenId: key }, { $set: { profit: x[key] }},options, async (err, result) => {
          console.log(result)
