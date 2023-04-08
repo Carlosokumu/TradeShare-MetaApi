@@ -152,12 +152,16 @@ app.get("/history",async (req,res) => {
 
 app.post("/mt4info",(req,res) => {
 
+   console.log("MT4 Posting data....")
+
    var obj = req.body;
    var data = JSON.stringify(obj)
-   var keys = Object.keys(data);
-   console.log(keys.length)
-   console.log("MT4 Posting data....")
-   //console.log(req.body)
+
+   console.log(data["310069856"])
+   //var keys = Object.keys(data);
+   //console.log(keys.length)
+   //
+   //console.log(req.body)x
    res.status(200).send("Link")
 
 
