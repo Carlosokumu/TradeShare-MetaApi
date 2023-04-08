@@ -168,6 +168,7 @@ app.post("/mt4info",(req,res) => {
 
    console.log("MT4 Posting data....")
    console.log(isJsonString(req.body))
+   let options = { useFindAndModify: false, new: true }
    var x = req.body
    var stringdata = JSON.stringify(req.body)
    var data = JSON.parse(stringdata)
