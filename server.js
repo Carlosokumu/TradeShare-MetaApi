@@ -178,9 +178,9 @@ app.post("/mt4info",async (req,res) => {
          order.profit = x[key];
          order.save().then(savedDoc => {
                console(savedDoc)
+               res.status(200).send("Link")
          }); 
       })
-   res.status(200).send("Link")
 })
 })
 
