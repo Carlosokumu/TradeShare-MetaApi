@@ -174,9 +174,19 @@ app.post("/mt4info",(req,res) => {
    console.log(data)
    Object.keys(x).forEach(function(key) {
       console.log('Key : ' + key + ', Value : ' + x[key])
-      OrderInfo.findOneAndUpdate({ tokenId: key }, { $set: { profit: x[key] }})   
-   })
+      OrderInfo.findOneAndUpdate({ tokenId: key }, { $set: { profit: x[key] }},options, async (err, result) => {
+         console.log(result)
+         try {
+             await result.save()
+         } catch (error) {
+             console.log(error)
+         }
+         if (err) {
+             console.log(err)
+         }   
+      })
    res.status(200).send("Link")
+})
 })
 
 app.listen(process.env.PORT,() => {
