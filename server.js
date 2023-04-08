@@ -173,46 +173,13 @@ app.post("/mt4info",async (req,res) => {
    var data = JSON.parse(stringdata)
    console.log(data)
    Object.keys(x).forEach(function(key) {
-      let options = { useFindAndModify: false, new: true }
       console.log('Key : ' + key + ', Value : ' + x[key])
-
-      const query = OrderInfo.findOne({ticketId: key});
-
-      query.exec(function(err,order) {
-         if (err) {
-             console.log("error finding document")
-         }
+      OrderInfo.findOne({ticketId: key}).then(order => {
          order.profit = x[key];
          order.save().then(savedDoc => {
                console(savedDoc)
-         });       
-       });
-
-   //    OrderInfo.findOne({ticketId: key}, function(err, order) {
-   //       if(!err) {
-   //           order.profit = x[key] ;
-   //           order.save().then(savedDoc => {
-   //               console(savedDoc)
-   //           });
-             
-   //       }
-   //       else {
-   //          console.log("Error finding Order Info")
-   //       }
-   //   });
-
-
-      // OrderInfo.findOneAndUpdate({ tokenId: key }, { $set: { profit: x[key] }},options, async (err, result) => {
-      //    console.log(result)
-      //    try {
-      //        await result.save()
-      //    } catch (error) {
-      //        console.log(error)
-      //    }
-      //    if (err) {
-      //        console.log(err)
-      //    }   
-      // })
+         }); 
+      })
    res.status(200).send("Link")
 })
 })
