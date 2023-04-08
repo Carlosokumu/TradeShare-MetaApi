@@ -154,14 +154,10 @@ app.post("/mt4info",(req,res) => {
 
    console.log("MT4 Posting data....")
 
-   var obj = req.body;
-   var data = JSON.stringify(obj)
-
-   console.log(data["310069856"])
-   //var keys = Object.keys(data);
-   //console.log(keys.length)
-   //
-   //console.log(req.body)x
+   var data = req.body;
+   Object.keys(data).forEach(function(key) {
+      console.log('Key : ' + key + ', Value : ' + data[key])
+    })
    res.status(200).send("Link")
 
 
