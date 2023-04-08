@@ -168,11 +168,12 @@ app.post("/mt4info",(req,res) => {
 
    console.log("MT4 Posting data....")
    console.log(isJsonString(req.body))
-
+   var stringdata = JSON.stringify(req.body)
+   var data = JSON.parse(stringdata)
    // var data = req.body;
-   // Object.keys(data).forEach(function(key) {
-   //    console.log('Key : ' + key + ', Value : ' + data[key])
-   //  })
+   Object.keys(data).forEach(function(key) {
+       console.log('Key : ' + key + ', Value : ' + data[key])
+   })
    res.status(200).send("Link")
 
 
