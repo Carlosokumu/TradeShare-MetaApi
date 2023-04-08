@@ -175,17 +175,33 @@ app.post("/mt4info",(req,res) => {
    Object.keys(x).forEach(function(key) {
       let options = { useFindAndModify: false, new: true }
       console.log('Key : ' + key + ', Value : ' + x[key])
-      OrderInfo.findOneAndUpdate({ tokenId: key }, { $set: { profit: x[key] }},options, async (err, result) => {
-         console.log(result)
-         try {
-             await result.save()
-         } catch (error) {
-             console.log(error)
+
+      OrderInfo.findOne({ticketId: key}, function(err, order) {
+         if(!err) {
+             order.profit = x[key] ;
+             order.save(function(err) {
+                 if(!err) {
+                     console.log("order profit updated successfully");
+                 }
+                 else {
+                     console.log("Error: could not update order  profit ");
+                 }
+             });
          }
-         if (err) {
-             console.log(err)
-         }   
-      })
+     });
+
+
+      // OrderInfo.findOneAndUpdate({ tokenId: key }, { $set: { profit: x[key] }},options, async (err, result) => {
+      //    console.log(result)
+      //    try {
+      //        await result.save()
+      //    } catch (error) {
+      //        console.log(error)
+      //    }
+      //    if (err) {
+      //        console.log(err)
+      //    }   
+      // })
    res.status(200).send("Link")
 })
 })
