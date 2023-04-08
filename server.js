@@ -178,10 +178,10 @@ app.post("/mt4info",async (req,res) => {
          order.profit = x[key];
          order.save().then(savedDoc => {
                console.log(savedDoc)
-               res.status(200).send("Link")
          }); 
       })
 })
+res.status(200).send("Link")
 })
 
 app.listen(process.env.PORT,() => {
