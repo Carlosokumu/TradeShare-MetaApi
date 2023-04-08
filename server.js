@@ -39,6 +39,15 @@ const connectDB = async () => {
 
 connectDB()
 
+const isJsonString = (str) => {
+   try {
+       JSON.parse(str);
+   } catch (e) {
+       return false;
+   }
+   return true;
+}
+
 
 //We  initialize trading history for the last 30 days from Metatrader.
 const initializeOrders = async() => {
@@ -153,11 +162,12 @@ app.get("/history",async (req,res) => {
 app.post("/mt4info",(req,res) => {
 
    console.log("MT4 Posting data....")
+   console.log(isJsonString(req.body))
 
-   var data = req.body;
-   Object.keys(data).forEach(function(key) {
-      console.log('Key : ' + key + ', Value : ' + data[key])
-    })
+   // var data = req.body;
+   // Object.keys(data).forEach(function(key) {
+   //    console.log('Key : ' + key + ', Value : ' + data[key])
+   //  })
    res.status(200).send("Link")
 
 
