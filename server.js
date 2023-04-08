@@ -40,7 +40,7 @@ const connectDB = async () => {
 connectDB()
 
 const isJsonString = (str) => {
-   if(!str && typeof jsonString === "string"){
+   if(!str && typeof str === "string"){
       console.log("json error")
       return false;
   }
