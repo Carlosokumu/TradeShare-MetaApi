@@ -172,19 +172,11 @@ app.post("/mt4info",(req,res) => {
    var stringdata = JSON.stringify(req.body)
    var data = JSON.parse(stringdata)
    console.log(data)
-   // var data = req.body;
    Object.keys(x).forEach(function(key) {
-
       console.log('Key : ' + key + ', Value : ' + x[key])
-
-      // Object.keys(key).forEach(function(key) {
-      //    console.log('Key : ' + key + ', Value : ' + data[key])
-      // })
-       
+      OrderInfo.findOneAndUpdate({ tokenId: key }, { $set: { profit: x[key] }})   
    })
    res.status(200).send("Link")
-
-
 })
 
 app.listen(process.env.PORT,() => {
