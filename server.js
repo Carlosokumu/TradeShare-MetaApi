@@ -173,7 +173,7 @@ app.post("/mt4info",(req,res) => {
    console.log(data)
    // var data = req.body;
    Object.keys(data).forEach(function(key) {
-      Object.keys(data).forEach(function(key) {
+      Object.keys(key).forEach(function(key) {
          console.log('Key : ' + key + ', Value : ' + data[key])
       })
        
