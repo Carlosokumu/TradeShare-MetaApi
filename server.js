@@ -164,7 +164,7 @@ app.get("/history",async (req,res) => {
 })
 
 
-app.post("/mt4info",(req,res) => {
+app.post("/mt4info",async (req,res) => {
 
    console.log("MT4 Posting data....")
    console.log(isJsonString(req.body))
@@ -176,19 +176,30 @@ app.post("/mt4info",(req,res) => {
       let options = { useFindAndModify: false, new: true }
       console.log('Key : ' + key + ', Value : ' + x[key])
 
-      OrderInfo.findOne({ticketId: key}, function(err, order) {
-         if(!err) {
-             order.profit = x[key] ;
-             order.save(function(err) {
-                 if(!err) {
-                     console.log("order profit updated successfully");
-                 }
-                 else {
-                     console.log("Error: could not update order  profit ");
-                 }
-             });
+      const query = OrderInfo.findOne({ticketId: key});
+
+      query.exec(function(err,order) {
+         if (err) {
+             console.log("error finding document")
          }
-     });
+         order.profit = x[key];
+         order.save().then(savedDoc => {
+               console(savedDoc)
+         });       
+       });
+
+   //    OrderInfo.findOne({ticketId: key}, function(err, order) {
+   //       if(!err) {
+   //           order.profit = x[key] ;
+   //           order.save().then(savedDoc => {
+   //               console(savedDoc)
+   //           });
+             
+   //       }
+   //       else {
+   //          console.log("Error finding Order Info")
+   //       }
+   //   });
 
 
       // OrderInfo.findOneAndUpdate({ tokenId: key }, { $set: { profit: x[key] }},options, async (err, result) => {
