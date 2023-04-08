@@ -177,7 +177,7 @@ app.post("/mt4info",async (req,res) => {
       OrderInfo.findOne({ticketId: key}).then(order => {
          order.profit = x[key];
          order.save().then(savedDoc => {
-               console(savedDoc)
+               console.log(savedDoc)
                res.status(200).send("Link")
          }); 
       })
