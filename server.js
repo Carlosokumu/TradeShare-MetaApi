@@ -40,6 +40,10 @@ const connectDB = async () => {
 connectDB()
 
 const isJsonString = (str) => {
+   if(!str && typeof jsonString === "string"){
+      console.log("json error")
+      return false;
+  }
    try {
        JSON.parse(str);
    } catch (e) {
