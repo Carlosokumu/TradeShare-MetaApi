@@ -45,7 +45,8 @@ const isJsonString = (str) => {
       return false;
   }
    try {
-       JSON.parse(str);
+       var data = JSON.stringify(str)
+       JSON.parse(data);
    } catch (e) {
        return false;
    }
