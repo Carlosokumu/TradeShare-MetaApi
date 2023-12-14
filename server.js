@@ -5,6 +5,7 @@ const config = require("./config");
 
 //Environment variabless
 const token = process.env.ACCOUNT_TOKEN || config.accessToken;
+const port = process.env.PORT
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -123,6 +124,6 @@ app.get("/history", async (req, res) => {
   res.status(200).json({ trades: trades });
 });
 
-app.listen(8000, () => {
-  console.log("Server running on port: 8000");
+app.listen(port, () => {
+  console.log("Server running");
 });
