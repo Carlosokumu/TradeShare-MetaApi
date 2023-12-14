@@ -12,7 +12,7 @@ export default class ClientApiClient extends MetaApiClient {
    * @param {HttpClient} httpClient HTTP client
    * @param {DomainClient} domainClient domain client
    */
-  constructor(httpClient: HttpClient, domainClient: DomainClient): void;
+  constructor(httpClient: HttpClient, domainClient: DomainClient);
 
   /**
    * Retrieves hashing ignored field lists

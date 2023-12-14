@@ -1,3 +1,6 @@
+19.7.8
+  - fixed typings
+
 19.7.7
   - fixed resubscribe on disconnect
 

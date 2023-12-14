@@ -1,4 +1,4 @@
-import MetatraderAccountClient, { MetatraderAccountReplica, MetatraderAccountReplicaDto, MetatraderAccountReplicaUpdateDto } from "../clients/metaApi/metatraderAccount.client";
+import MetatraderAccountClient, { MetatraderAccountReplica, MetatraderAccountReplicaDto, UpdatedMetatraderAccountReplicaDto } from "../clients/metaApi/metatraderAccount.client";
 import MetatraderAccount from "./metatraderAccount";
 
 /**
@@ -165,8 +165,8 @@ export default class MetatraderAccountReplica {
   
   /**
    * Updates MetaTrader account replica data
-   * @param {MetatraderAccountReplicaUpdateDto} account MetaTrader account update
+   * @param {UpdatedMetatraderAccountReplicaDto} account MetaTrader account update
    * @return {Promise} promise resolving when account replica is updated
    */
-  update(account: MetatraderAccountReplicaUpdateDto): Promise<any>;
+  update(account: UpdatedMetatraderAccountReplicaDto): Promise<any>;
 }

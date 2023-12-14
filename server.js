@@ -1,189 +1,128 @@
-
-const express = require('express')
-let MetaApi = require('metaapi.cloud-sdk').default;
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const OrderInfo = require('./models/OrderInfo');
-
-
-
-
-
+const express = require("express");
+let MetaApi = require("metaapi.cloud-sdk").default;
+const bodyParser = require("body-parser");
+const config = require("./config");
 
 //Environment variabless
-const token = process.env.ACCOUNT_TOKEN
-let accountId = process.env.ACCOUNT_ID 
-const DATABASE_URL = process.env.DATABASE_URL
-
-
-const api = new MetaApi(token);
-
-
-//mongoose connection to the database
-const connectDB = async () => {
-    try {
-         await mongoose.connect(DATABASE_URL,{
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        }).then(client => {
-         console.log('MongoDB connected!!'); 
-         client.connections[0].collection("ordermodels").deleteMany({})
-        });
-    } catch (err) {
-        console.log('Failed to connect to MongoDB', err);
-    }
-};
-
-
-
-
-connectDB()
-
-const isJsonString = (str) => {
-   if(!str && typeof str === "string"){
-      console.log("json error")
-      return false;
-  }
-   try {
-       var data = JSON.stringify(str)
-       JSON.parse(data);
-   } catch (e) {
-       return false;
-   }
-   return true;
-}
-
-
-//We  initialize trading history for the last 30 days from Metatrader.
-const initializeOrders = async() => {
-
-   try {
-      const account = await api.metatraderAccountApi.getAccount(accountId);
-      const connection = account.getRPCConnection();
-      await connection.connect();
-      await connection.waitSynchronized();
-
-
-      var orders = [];
-
-      await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), new Date()).then(tradedata => {
-         for (var i = 0; i < tradedata.historyOrders.length; i++) {
-            var orderinfo = new OrderInfo();
-            orderinfo._id = new mongoose.Types.ObjectId();
-            orderinfo.ticketId = tradedata.historyOrders[i].id;
-            orderinfo.profit = tradedata.historyOrders[i].profit
-            orders.push(orderinfo); 
-        }
-         
-      }
-
-      ).catch(err => {
-           console.log("error getting orders:",err)
-      })  
-      OrderInfo.create(orders).then((result) => {
-         console.log("Created Orders Successfully:",result.length)
-       })
-       .catch((err) => {
-         console.log("Failed to Create Orders:",err)
-       })
-   }   
-   catch(err) {
-         console.log("Failed to connect to Trading account:",err)
-   }
-}
-initializeOrders()
-
-
-
-const app = express()
-
-
-
-
+const token = process.env.ACCOUNT_TOKEN || config.accessToken;
+const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+const api = new MetaApi(
+   token
+);
 
+app.post("/register", async (req, res) => {
+  const { name, login, platform, password, server } = req.body;
 
-app.get("/orders",async (req,res) => {
-   //Find all the orders
-   const orders = await OrderInfo.find()
-   res.status(200).json({
-      "orders": orders
-   })
-})
-
-
-
-
-app.get('/positions',async (req,res) => {
-   try {
-      const account = await api.metatraderAccountApi.getAccount(accountId);
-      const connection = account.getStreamingConnection();
-      await connection.connect();
-      const terminalState = connection.terminalState;
-      await connection.waitSynchronized();
+  if (!name || !login || !platform || !password || !server) {
+    return res.status(400).json({
+      message: "Please provide all required fields",
+    });
+  }
+  try {
+    const account = await api.metatraderAccountApi.createAccount({
+      name: name,
+      type: "cloud",
+      login: login,
+      platform: platform,
+      password: password,
+      server: server,
+      magic: 123456,
+      keywords: ["Swingwizards Ltd"],
+      quoteStreamingIntervalInSeconds: 2.5,
+      reliability: "high",
+    });
+    console.log("Account:", account);
+    return res.status(200).json({
+      deployed_account: account,
+    });
+  } catch (err) {
+    if (err.details) {
+      // returned if the server file for the specified server name has not been found
+      // recommended to check the server name or create the account using a provisioning profile
+      if (err.details === "E_SRV_NOT_FOUND") {
+        console.log(err);
+        res.status(404).json({
+          message: err,
+        });
+      }
+      // returned if the server has failed to connect to the broker using your credentials
+      // recommended to check your login and password
+      else if (err.details === "E_AUTH") {
+        console.log(err);
+        res.status(401).json({
+          message: err,
+        });
+      }
+      // returned if the server has failed to detect the broker settings
+      // recommended to try again later or create the account using a provisioning profile
+      else if (err.details === "E_SERVER_TIMEZONE") {
+        console.log(err);
+        res.status(200).json({
+          message: err,
+        });
+      }
+    } else {
+      console.log("Error:", err);
       res.status(200).json({
-         "positions":terminalState.positions
-      })
-      console.log(terminalState.positions);
-   }   
-   catch(err) {
-         console.log("FETCHERROR",err)
-   }
-})
+        message: err,
+      });
+    }
+  }
+});
 
-app.get('/account',async (req,res) => {
-   try {
-      const account = await api.metatraderAccountApi.getAccount(accountId);
-      const connection = account.getStreamingConnection();
-      await connection.connect();
-      const terminalState = connection.terminalState;
-      await connection.waitSynchronized();
-      console.log(terminalState.accountInformation)
-      res.status(200).json(terminalState.accountInformation)
-   }   
-   catch(err) {
-         console.log(err)
-   }
-})
+app.get("/history", async (req, res) => {
+  const { account_id, history_range, offset } = req.body;
+  let startTime, endTime;
+  const trades = [];
 
-app.get("/history",async (req,res) => {
-   startTime = "2020-09-10 15:00:00.000"
-   endTime = "2020-10-10 15:00:00.000"
+  if (!account_id || !history_range) {
+    return res.status(400).json({
+      message: "account_id or history range parameter are required",
+    });
+  }
+  switch (parseInt(history_range)) {
+    case 1: // Today
+      startTime = new Date();
+      endTime = new Date();
+      break;
+    case 2: // Last 30 days (a month)
+      startTime = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      endTime = new Date();
+      break;
+    default:
+      return res.status(400).json({
+        message: "Invalid history range parameter",
+      });
+  }
+  const account = await api.metatraderAccountApi.getAccount(account_id);
+  const connection = account.getRPCConnection();
+  await connection.connect();
+  await connection.waitSynchronized();
+  const orders = await connection.getHistoryOrdersByTimeRange(
+    startTime,
+    endTime,
+    offset || 0,
+    25
+  );
+  for (var i = 0; i < orders.historyOrders.length; i++) {
+    const position = await connection.getDealsByPosition(
+      orders.historyOrders[i].positionId
+    );
+    for (var j = 0; j < position.deals.length; j++) {
+      trades.push({
+        type: position.deals[j].type,
+        profit: position.deals[j].profit,
+        symbol: position.deals[j].symbol,
+      });
+    }
+  }
+  res.status(200).json({ trades: trades });
+});
 
-   const account = await api.metatraderAccountApi.getAccount(accountId);
-
-   const connection = account.getRPCConnection();
-
-    await connection.connect();
-    await connection.waitSynchronized();
-    const orders = await connection.getHistoryOrdersByTimeRange(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), new Date())
-     res.status(200).json({"orders" : orders})
-})
-
-
-app.post("/mt4info",async (req,res) => {
-
-   console.log("MT4 Posting data....")
-   console.log(isJsonString(req.body))
-   var x = req.body
-   var stringdata = JSON.stringify(req.body)
-   var data = JSON.parse(stringdata)
-   console.log(data)
-   Object.keys(x).forEach(function(key) {
-      console.log('Key : ' + key + ', Value : ' + x[key])
-      OrderInfo.findOne({ticketId: key}).then(order => {
-         order.profit = x[key];
-         order.save().then(savedDoc => {
-               console.log(savedDoc)
-         }); 
-      })
-})
-res.status(200).send("Link")
-})
-
-app.listen(process.env.PORT,() => {
-   console.log("Server running on port: 8000")
-})
+app.listen(8000, () => {
+  console.log("Server running on port: 8000");
+});

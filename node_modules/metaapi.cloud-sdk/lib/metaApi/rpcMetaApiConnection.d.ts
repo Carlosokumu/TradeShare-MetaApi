@@ -1,4 +1,4 @@
-import MetaApiWebsocketClient, { MetatraderAccountInformation, MetatraderCandle, MetatraderDeal, MetatraderDeals, MetatraderHistoryOrders, MetatraderOrder, MetatraderPosition, MetatraderSymbolPrice, MetatraderSymbolSpecification, MetatraderTick } from "../clients/metaApi/metaApiWebsocket.client";
+import MetaApiWebsocketClient, { MetatraderAccountInformation, MetatraderCandle, MetatraderDeals, MetatraderHistoryOrders, MetatraderOrder, MetatraderPosition, MetatraderSymbolPrice, MetatraderSymbolSpecification, MetatraderTick, ServerTime } from "../clients/metaApi/metaApiWebsocket.client";
 import MetaApiConnection from "./metaApiConnection";
 import MetatraderAccount from "./metatraderAccount";
 

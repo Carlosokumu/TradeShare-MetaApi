@@ -1,4 +1,4 @@
-import MetatraderAccountClient, { MetatraderAccountReplica } from "../clients/metaApi/metatraderAccount.client";
+import MetatraderAccountClient, { AccountConnection } from "../clients/metaApi/metatraderAccount.client";
 import { MetatraderAccountDto } from "../clients/metaApi/metatraderAccount.client";
 import MetaApiWebsocketClient, { MetatraderCandle, MetatraderTick } from "../clients/metaApi/metaApiWebsocket.client";
 import ConnectionRegistry from "./connectionRegistry";
@@ -8,6 +8,7 @@ import HistoryStorage from "./historyStorage";
 import RpcMetaApiConnection from "./rpcMetaApiConnection";
 import ExpertAdvisor from "./expertAdvisor";
 import StreamingMetaApiConnection from "./streamingMetaApiConnection";
+import MetatraderAccountReplica from './metatraderAccountReplica';
 
 /**
  * Implements a MetaTrader account entity
