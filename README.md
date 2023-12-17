@@ -1,5 +1,6 @@
-# Mt4-Api
-Cloud functions for the metatrader  api
+# Metatrader forex-Api
+
+This is a simple  api  that allows traders connect  to their metatrader trading accounts and expose their trading portfolios to the public.
 
 
-This is a simple Api that allows you to communicate with the Metatrader api
+
