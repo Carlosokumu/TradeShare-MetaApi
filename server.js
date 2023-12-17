@@ -2,18 +2,16 @@ const express = require("express");
 let MetaApi = require("metaapi.cloud-sdk").default;
 const bodyParser = require("body-parser");
 const config = require("./config");
-
+const db = require("./db/queries");
 //Environment variabless
 const token = process.env.ACCOUNT_TOKEN || config.accessToken;
-const port = process.env.PORT
+const port = process.env.PORT || "8000";
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const api = new MetaApi(
-   token
-);
+const api = new MetaApi(token);
 
 app.post("/register", async (req, res) => {
   const { name, login, platform, password, server } = req.body;
@@ -23,8 +21,8 @@ app.post("/register", async (req, res) => {
       message: "Please provide all required fields",
     });
   }
-  try {
-    const account = await api.metatraderAccountApi.createAccount({
+  api.metatraderAccountApi
+    .createAccount({
       name: name,
       type: "cloud",
       login: login,
@@ -35,48 +33,56 @@ app.post("/register", async (req, res) => {
       keywords: ["Swingwizards Ltd"],
       quoteStreamingIntervalInSeconds: 2.5,
       reliability: "high",
-    });
-    console.log("Account:", account);
-    return res.status(200).json({
-      deployed_account: account,
-    });
-  } catch (err) {
-    if (err.details) {
-      // returned if the server file for the specified server name has not been found
-      // recommended to check the server name or create the account using a provisioning profile
-      if (err.details === "E_SRV_NOT_FOUND") {
-        console.log(err);
-        res.status(404).json({
-          message: err,
-        });
-      }
-      // returned if the server has failed to connect to the broker using your credentials
-      // recommended to check your login and password
-      else if (err.details === "E_AUTH") {
-        console.log(err);
-        res.status(401).json({
-          message: err,
-        });
-      }
-      // returned if the server has failed to detect the broker settings
-      // recommended to try again later or create the account using a provisioning profile
-      else if (err.details === "E_SERVER_TIMEZONE") {
-        console.log(err);
-        res.status(200).json({
-          message: err,
-        });
-      }
-    } else {
-      console.log("Error:", err);
-      res.status(200).json({
-        message: err,
+    })
+    .then((account) => {
+      db.updateUserAccountId(account._data._id, name, (error, results) => {
+        if (error) {
+          throw error;
+        } else {
+          return res.status(200).json({
+            deployed_account: account._data,
+          });
+        }
       });
-    }
-  }
+    })
+    .catch((error) => {
+      if (error.details) {
+        // returned if the server file for the specified server name has not been found
+        // recommended to check the server name or create the account using a provisioning profile
+        if (error.details === "E_SRV_NOT_FOUND") {
+          console.log(error);
+          res.status(404).json({
+            message: "Broker Server  not found",
+          });
+        }
+        // returned if the server has failed to connect to the broker using your credentials
+        // recommended to check your login and password
+        else if (error.details === "E_AUTH") {
+          console.log(error);
+          res.status(401).json({
+            message:
+              "Failed to connect to your broker.Please check your login and password and try again",
+          });
+        }
+        // returned if the server has failed to detect the broker settings
+        // recommended to try again later or create the account using a provisioning profile
+        else if (error.details === "E_SERVER_TIMEZONE") {
+          console.log(error);
+          res.status(400).json({
+            message: error,
+          });
+        }
+      } else {
+        res.status(error.status).json({
+          message: error,
+        });
+      }
+    });
 });
 
 app.get("/history", async (req, res) => {
   const { account_id, history_range, offset } = req.body;
+
   let startTime, endTime;
   const trades = [];
 
