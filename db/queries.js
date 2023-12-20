@@ -10,6 +10,22 @@ const pool = new Pool({
   },
 });
 
+const checkUsernameExistence = (username, callback) => {
+  pool.query(
+    "SELECT * FROM user_models WHERE user_name = $1",
+    [username],
+    (error, results) => {
+      if (error) {
+        console.error("Error checking username existence:", error);
+        callback(error, null);
+      } else {
+        callback(null, results.rows.length > 0);
+      }
+    }
+  );
+};
+
+
 const updateUserAccountId = (accountId, username, callback) => {
   console.log("Username:", username);
   pool.query(
@@ -29,4 +45,5 @@ const updateUserAccountId = (accountId, username, callback) => {
 
 module.exports = {
   updateUserAccountId,
+  checkUsernameExistence
 };
