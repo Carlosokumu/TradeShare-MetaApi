@@ -31,7 +31,7 @@ const checkIfUserExists = (req, res, next) => {
       }
     }
   });
-}
+};
 
 app.post("/register", checkIfUserExists, async (req, res) => {
   const { name, login, platform, password, server } = req.body;
@@ -101,10 +101,12 @@ app.post("/register", checkIfUserExists, async (req, res) => {
 });
 
 app.get("/history", async (req, res) => {
-  const { account_id, history_range, offset } = req.body;
+  const { account_id, history_range, offset } = req.query;
 
   let startTime, endTime;
   const trades = [];
+
+  console.log("Account_Id", account_id);
 
   if (!account_id || !history_range) {
     return res.status(400).json({
@@ -125,29 +127,38 @@ app.get("/history", async (req, res) => {
         message: "Invalid history range parameter",
       });
   }
-  const account = await api.metatraderAccountApi.getAccount(account_id);
-  const connection = account.getRPCConnection();
-  await connection.connect();
-  await connection.waitSynchronized();
-  const orders = await connection.getHistoryOrdersByTimeRange(
-    startTime,
-    endTime,
-    offset || 0,
-    25
-  );
-  for (var i = 0; i < orders.historyOrders.length; i++) {
-    const position = await connection.getDealsByPosition(
-      orders.historyOrders[i].positionId
+  try {
+    const account = await api.metatraderAccountApi.getAccount(account_id);
+    const connection = account.getRPCConnection();
+    await connection.connect();
+    await connection.waitSynchronized();
+    const orders = await connection.getHistoryOrdersByTimeRange(
+      startTime,
+      endTime,
+      offset || 0,
+      25
     );
-    for (var j = 0; j < position.deals.length; j++) {
-      trades.push({
-        type: position.deals[j].type,
-        profit: position.deals[j].profit,
-        symbol: position.deals[j].symbol,
-      });
+    for (var i = 0; i < orders.historyOrders.length; i++) {
+      const position = await connection.getDealsByPosition(
+        orders.historyOrders[i].positionId
+      );
+      for (var j = 0; j < position.deals.length; j++) {
+        trades.push({
+          type: position.deals[j].type,
+          profit: position.deals[j].profit,
+          symbol: position.deals[j].symbol,
+        });
+      }
+    }
+    res.status(200).json({ trades: trades });
+  } catch (error) {
+    if (error.message) {
+       console.log("Error Details:",error.message)
+       res.status(error.status).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error });
     }
   }
-  res.status(200).json({ trades: trades });
 });
 
 app.listen(port, () => {
