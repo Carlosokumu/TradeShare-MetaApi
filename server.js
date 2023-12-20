@@ -3,6 +3,7 @@ let MetaApi = require("metaapi.cloud-sdk").default;
 const bodyParser = require("body-parser");
 const config = require("./config");
 const db = require("./db/queries");
+
 //Environment variabless
 const token = process.env.ACCOUNT_TOKEN || config.accessToken;
 const port = process.env.PORT || "8000";
@@ -13,7 +14,26 @@ app.use(bodyParser.json());
 
 const api = new MetaApi(token);
 
-app.post("/register", async (req, res) => {
+function checkIfUserExists(req, res, next) {
+  db.checkUsernameExistence(req.body.name, (existenceError, usernameExists) => {
+    if (existenceError) {
+      return res.status(500).json({
+        message: existenceError,
+      });
+    } else {
+      if (usernameExists) {
+        next();
+      } else {
+        return res.status(404).json({
+          message:
+            "Please check that the username is registered in SwingWizards.",
+        });
+      }
+    }
+  });
+}
+
+app.post("/register", checkIfUserExists, async (req, res) => {
   const { name, login, platform, password, server } = req.body;
 
   if (!name || !login || !platform || !password || !server) {
