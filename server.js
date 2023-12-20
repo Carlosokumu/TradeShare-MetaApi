@@ -7,12 +7,17 @@ const db = require("./db/queries");
 //Environment variabless
 const token = process.env.ACCOUNT_TOKEN || config.accessToken;
 const port = process.env.PORT || "8000";
-const app = express();
 
+
+const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 const api = new MetaApi(token);
+
+
+const DEFAULT_OFFSET = 0;
+const DEFAULT_LIMIT = 25;
 
 const checkIfUserExists = (req, res, next) => {
   db.checkUsernameExistence(req.body.name, (existenceError, usernameExists) => {
@@ -126,6 +131,7 @@ app.get("/history", async (req, res) => {
       return res.status(400).json({
         message: "Invalid history range parameter",
       });
+    //   TODO: Implement cases where a custom period can be used to filter historical trades
   }
   try {
     const account = await api.metatraderAccountApi.getAccount(account_id);
@@ -135,8 +141,8 @@ app.get("/history", async (req, res) => {
     const orders = await connection.getHistoryOrdersByTimeRange(
       startTime,
       endTime,
-      offset || 0,
-      25
+      offset || DEFAULT_OFFSET,
+      DEFAULT_LIMIT
     );
     for (var i = 0; i < orders.historyOrders.length; i++) {
       const position = await connection.getDealsByPosition(
@@ -153,10 +159,9 @@ app.get("/history", async (req, res) => {
     res.status(200).json({ trades: trades });
   } catch (error) {
     if (error.message) {
-       console.log("Error Details:",error.message)
-       res.status(error.status).json({ message: error.message });
+      res.status(error.status).json({ message: error.message });
     } else {
-      res.status(500).json({ message: error });
+      res.status(error.status).json({ message: error });
     }
   }
 });
