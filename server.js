@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 
 const api = new MetaApi(token);
 
-function checkIfUserExists(req, res, next) {
+const checkIfUserExists = (req, res, next) => {
   db.checkUsernameExistence(req.body.name, (existenceError, usernameExists) => {
     if (existenceError) {
       return res.status(500).json({
