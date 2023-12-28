@@ -43,7 +43,7 @@ app.post("/register", checkIfUserExists, async (req, res) => {
 
   if (!name || !login || !platform || !password || !server) {
     return res.status(400).json({
-      message: "Please provide all required fields",
+      message: "Please provide all the required fields",
     });
   }
   api.metatraderAccountApi
@@ -60,6 +60,7 @@ app.post("/register", checkIfUserExists, async (req, res) => {
       reliability: "high",
     })
     .then((account) => {
+      console.log("Account:",account)
       db.updateUserAccountId(account._data._id, name, (error, results) => {
         if (error) {
           throw error;
@@ -99,7 +100,7 @@ app.post("/register", checkIfUserExists, async (req, res) => {
         }
       } else {
         res.status(error.status).json({
-          message: error,
+          message: error.message,
         });
       }
     });
