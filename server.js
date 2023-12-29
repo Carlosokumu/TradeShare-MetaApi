@@ -58,7 +58,6 @@ app.post("/register", checkIfUserExists, async (req, res) => {
       reliability: "high",
     })
     .then((account) => {
-      console.log("Account:", account);
       db.updateUserAccountId(account._data._id, name, (error, results) => {
         if (error) {
           throw error;
