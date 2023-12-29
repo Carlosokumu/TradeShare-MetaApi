@@ -8,13 +8,11 @@ const db = require("./db/queries");
 const token = process.env.ACCOUNT_TOKEN || config.accessToken;
 const port = process.env.PORT || "8000";
 
-
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 const api = new MetaApi(token);
-
 
 const DEFAULT_OFFSET = 0;
 const DEFAULT_LIMIT = 25;
@@ -60,7 +58,7 @@ app.post("/register", checkIfUserExists, async (req, res) => {
       reliability: "high",
     })
     .then((account) => {
-      console.log("Account:",account)
+      console.log("Account:", account);
       db.updateUserAccountId(account._data._id, name, (error, results) => {
         if (error) {
           throw error;
@@ -72,6 +70,7 @@ app.post("/register", checkIfUserExists, async (req, res) => {
       });
     })
     .catch((error) => {
+      console.log("Error", error);
       if (error.details) {
         // returned if the server file for the specified server name has not been found
         // recommended to check the server name or create the account using a provisioning profile
@@ -96,6 +95,10 @@ app.post("/register", checkIfUserExists, async (req, res) => {
           console.log(error);
           res.status(400).json({
             message: error,
+          });
+        } else {
+          res.status(error.status).json({
+            message: error.details[0].message,
           });
         }
       } else {
