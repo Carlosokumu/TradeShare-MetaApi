@@ -126,7 +126,11 @@ app.get("/history", async (req, res) => {
       startTime = new Date();
       endTime = new Date();
       break;
-    case 2: // Last 30 days (a month)
+    case 2: // Last 7 days (a week)
+      startTime = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      endTime = new Date();
+      break;
+    case 3: // Last 30 days (a month)
       startTime = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
       endTime = new Date();
       break;
@@ -141,26 +145,35 @@ app.get("/history", async (req, res) => {
     const connection = account.getRPCConnection();
     await connection.connect();
     await connection.waitSynchronized();
+    connection.getCo;
     const orders = await connection.getHistoryOrdersByTimeRange(
       startTime,
       endTime,
-      offset || DEFAULT_OFFSET,
+      parseInt(offset) || DEFAULT_OFFSET,
       DEFAULT_LIMIT
     );
     for (var i = 0; i < orders.historyOrders.length; i++) {
       const position = await connection.getDealsByPosition(
         orders.historyOrders[i].positionId
       );
-      for (var j = 0; j < position.deals.length; j++) {
-        trades.push({
-          type: position.deals[j].type,
-          profit: position.deals[j].profit,
-          symbol: position.deals[j].symbol,
-        });
+      const closedPositions = position.deals.filter(
+        (deal) => deal.entryType === "DEAL_ENTRY_OUT"
+      );
+
+      for (var j = 0; j < closedPositions.length; j++) {
+        if (!trades.map((trade) => trade.id).includes(closedPositions[j].id)) {
+          trades.push({
+            id: closedPositions[j].id,
+            type: closedPositions[j].type,
+            profit: closedPositions[j].profit,
+            symbol: closedPositions[j].symbol,
+          });
+        }
       }
     }
     res.status(200).json({ trades: trades });
   } catch (error) {
+    console.log("Error:", error);
     if (error.message) {
       res.status(error.status).json({ message: error.message });
     } else {
