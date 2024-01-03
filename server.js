@@ -113,9 +113,6 @@ app.get("/history", async (req, res) => {
 
   let startTime, endTime;
   const trades = [];
-
-  console.log("Account_Id", account_id);
-
   if (!account_id || !history_range) {
     return res.status(400).json({
       message: "account_id or history range parameter are required",
@@ -173,7 +170,7 @@ app.get("/history", async (req, res) => {
     }
     res.status(200).json({ trades: trades });
   } catch (error) {
-    console.log("Error:", error);
+    console.log("Error", error);
     if (error.message) {
       res.status(error.status).json({ message: error.message });
     } else {
