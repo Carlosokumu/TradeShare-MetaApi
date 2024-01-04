@@ -184,7 +184,8 @@ app.get("/history", async (req, res) => {
             type: closedPositions[j].type,
             profit: closedPositions[j].profit,
             symbol: closedPositions[j].symbol,
-            createdAt: getTimeDifference(closedPositions[j].time)
+            createdAt: getTimeDifference(closedPositions[j].time),
+            volume: closedPositions[j].volume
           });
         }
       }
