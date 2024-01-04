@@ -36,6 +36,25 @@ const checkIfUserExists = (req, res, next) => {
   });
 };
 
+const getTimeDifference = (dateString) => {
+  const currentDate = new Date();
+  const targetDate = new Date(dateString);
+  const timeDifference = currentDate - targetDate;
+  const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+
+  if (daysDifference === 1) {
+    return "a day ago";
+  } else if (daysDifference <= 7) {
+    return `${daysDifference} days ago`;
+  } else if (daysDifference <= 30) {
+    const weeks = Math.floor(daysDifference / 7);
+    return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+  } else {
+    const months = Math.floor(daysDifference / 30);
+    return `${months} month${months > 1 ? "s" : ""} ago`;
+  }
+};
+
 app.post("/register", checkIfUserExists, async (req, res) => {
   const { name, login, platform, password, server } = req.body;
 
@@ -156,6 +175,7 @@ app.get("/history", async (req, res) => {
       const closedPositions = position.deals.filter(
         (deal) => deal.entryType === "DEAL_ENTRY_OUT"
       );
+      console.log("ClosedPosition:", closedPositions);
 
       for (var j = 0; j < closedPositions.length; j++) {
         if (!trades.map((trade) => trade.id).includes(closedPositions[j].id)) {
@@ -164,6 +184,7 @@ app.get("/history", async (req, res) => {
             type: closedPositions[j].type,
             profit: closedPositions[j].profit,
             symbol: closedPositions[j].symbol,
+            createdAt: getTimeDifference(closedPositions[j].time)
           });
         }
       }
