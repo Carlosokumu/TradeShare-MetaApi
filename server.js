@@ -3,8 +3,6 @@ let MetaApi = require("metaapi.cloud-sdk").default;
 const bodyParser = require("body-parser");
 const config = require("./config");
 const db = require("./db/queries");
-const axios = require("axios");
-const fs = require("fs").promises;
 
 //Environment variabless
 const token = process.env.ACCOUNT_TOKEN || config.accessToken;
@@ -84,7 +82,7 @@ app.post("/register", checkIfUserExists, async (req, res) => {
       reliability: "high",
     })
     .then((account) => {
-      db.updateUserAccountId(account._data._id, name, (error, results) => {
+      db.updateUserAccountId(account._data._id, name, (error) => {
         if (error) {
           throw error;
         } else {
