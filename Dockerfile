@@ -1,15 +1,17 @@
 
 # Responsible for deployment of this service
-FROM node:16
 
+# Use the official Node.js image as the base image
+FROM node:18
+
+# Set the working directory in the container
 WORKDIR /app
 
-COPY package*.json ./
+# Copy the application files into the working directory
+COPY . /app
 
+# Install the application dependencies
 RUN npm install
 
-COPY . .
-
-EXPOSE 3000
-
-CMD [ "node", "server.js" ]
+# Define the entry point for the container
+CMD ["node", "server.js"]
