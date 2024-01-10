@@ -1,6 +1,6 @@
 
 # Responsible for deployment of this service
-FROM node:16
+FROM node:21
 
 ENV NODE_ENV=production
 
