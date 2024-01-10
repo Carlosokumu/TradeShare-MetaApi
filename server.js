@@ -211,5 +211,5 @@ app.get("/history", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log("Server running");
+  console.log("Server running 🚀");
 });
