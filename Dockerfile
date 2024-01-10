@@ -1,17 +1,15 @@
 
 # Responsible for deployment of this service
-FROM node:21
-
-ENV NODE_ENV=production
+FROM node:16
 
 WORKDIR /app
 
-COPY ["package.json", "package-lock.json*", "./"]
+COPY package*.json ./
 
-RUN npm install --production
+RUN npm install
 
 COPY . .
 
-EXPOSE 8080
+EXPOSE 3000
 
 CMD [ "node", "server.js" ]
