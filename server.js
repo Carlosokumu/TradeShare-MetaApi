@@ -3,6 +3,8 @@ let MetaApi = require("metaapi.cloud-sdk").default;
 const bodyParser = require("body-parser");
 const config = require("./config");
 const db = require("./db/queries");
+const axios = require("axios");
+const fs = require("fs").promises;
 
 //Environment variabless
 const token = process.env.ACCOUNT_TOKEN || config.accessToken;
@@ -16,6 +18,9 @@ const api = new MetaApi(token);
 
 const DEFAULT_OFFSET = 0;
 const DEFAULT_LIMIT = 25;
+const TODAY = 1;
+const WEEK = 2;
+const MONTH = 3;
 
 const checkIfUserExists = (req, res, next) => {
   db.checkUsernameExistence(req.body.name, (existenceError, usernameExists) => {
@@ -42,8 +47,10 @@ const getTimeDifference = (dateString) => {
   const timeDifference = currentDate - targetDate;
   const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
 
-  if (daysDifference === 1) {
-    return "a day ago";
+  if (daysDifference === 0) {
+    return "today";
+  } else if (daysDifference === 1) {
+    return "yesterday";
   } else if (daysDifference <= 7) {
     return `${daysDifference} days ago`;
   } else if (daysDifference <= 30) {
@@ -129,7 +136,7 @@ app.post("/register", checkIfUserExists, async (req, res) => {
 
 app.get("/history", async (req, res) => {
   const { account_id, history_range, offset } = req.query;
-
+  const currentDate = new Date();
   let startTime, endTime;
   const trades = [];
   if (!account_id || !history_range) {
@@ -138,15 +145,16 @@ app.get("/history", async (req, res) => {
     });
   }
   switch (parseInt(history_range)) {
-    case 1: // Today
-      startTime = new Date();
+    case TODAY: // Last 24 hours
+      startTime = new Date(currentDate);
+      startTime.setHours(currentDate.getHours() - 24);
       endTime = new Date();
       break;
-    case 2: // Last 7 days (a week)
+    case WEEK: // Last 7 days (a week)
       startTime = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       endTime = new Date();
       break;
-    case 3: // Last 30 days (a month)
+    case MONTH: // Last 30 days (a month)
       startTime = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
       endTime = new Date();
       break;
@@ -175,8 +183,6 @@ app.get("/history", async (req, res) => {
       const closedPositions = position.deals.filter(
         (deal) => deal.entryType === "DEAL_ENTRY_OUT"
       );
-      console.log("ClosedPosition:", closedPositions);
-
       for (var j = 0; j < closedPositions.length; j++) {
         if (!trades.map((trade) => trade.id).includes(closedPositions[j].id)) {
           trades.push({
@@ -185,12 +191,15 @@ app.get("/history", async (req, res) => {
             profit: closedPositions[j].profit,
             symbol: closedPositions[j].symbol,
             createdAt: getTimeDifference(closedPositions[j].time),
-            volume: closedPositions[j].volume
+            volume: closedPositions[j].volume,
+            time: closedPositions[j].time,
           });
         }
       }
     }
-    res.status(200).json({ trades: trades });
+    res.status(200).json({
+      trades: trades.sort((a, b) => Date.parse(b.time) - Date.parse(a.time)),
+    });
   } catch (error) {
     console.log("Error", error);
     if (error.message) {
