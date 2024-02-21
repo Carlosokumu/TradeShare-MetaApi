@@ -1,24 +1,20 @@
 const Pool = require("pg").Pool;
 const config = require("../config");
 
-const DB_URL = process.env.DB_URL || config.databaseUrl;
 
-// const pool = new Pool({
-
-//   connectionString: DB_URL,
-//   ssl: {
-//     rejectUnauthorized: false,
-//   },
-// });
-
+const user = process.env.USER;
+const host = process.env.HOST;
+const database = process.env.DB;
+const password = process.env.PASSWORD;
+const port = process.env.DB_PORT;
 
 const pool = new Pool({
-  user: 'swingwizards_users_user',
-  host: 'dpg-clk1dveg1b2c739f9rqg-a',
-  database: 'swingwizards_users',
-  password: 'U84u2BM2lRGFIoCArcrIxtYaLQ3fhBmd',
-  port: 5432,
-})
+  user: user,
+  host: host,
+  database: database,
+  password: password,
+  port: port,
+});
 
 const checkUsernameExistence = (username, callback) => {
   pool.query(
@@ -34,7 +30,6 @@ const checkUsernameExistence = (username, callback) => {
     }
   );
 };
-
 
 const updateUserAccountId = (accountId, username, callback) => {
   console.log("Username:", username);
@@ -55,5 +50,5 @@ const updateUserAccountId = (accountId, username, callback) => {
 
 module.exports = {
   updateUserAccountId,
-  checkUsernameExistence
+  checkUsernameExistence,
 };
