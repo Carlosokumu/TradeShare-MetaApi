@@ -16,7 +16,7 @@ class TradeShareSynchronizationListener extends SynchronizationListener {
    * @param {MetatraderOrder} historyOrder new MetaTrader history order
    */
   onHistoryOrderAdded(instanceIndex, historyOrder) {
-    console.log("HistoryOrder:", historyOrder);
+   // console.log("HistoryOrder:", historyOrder);
   }
 
   /**
@@ -46,6 +46,21 @@ class TradeShareSynchronizationListener extends SynchronizationListener {
   onPendingOrderCompleted(instanceIndex, orderId) {
     console.log("OrderId:", orderId);
   }
+
+
+  /**
+   * Invoked when MetaTrader account information is updated
+   * @param {String} instanceIndex index of an account instance connected
+   * @param {MetatraderAccountInformation} accountInformation updated MetaTrader account information
+   */
+   onAccountInformationUpdated(instanceIndex, accountInformation) {
+     console.log("MetatraderAccountInfo:",accountInformation)
+   }
+
+   onSymbolPricesUpdated(instanceIndex, prices, equity, margin, freeMargin, marginLevel,
+    accountCurrencyExchangeRate) {
+      console.log("Equity:",equity)
+    }
 }
 
 module.exports = {
