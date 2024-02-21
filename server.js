@@ -3,10 +3,18 @@ let MetaApi = require("metaapi.cloud-sdk").default;
 const bodyParser = require("body-parser");
 const config = require("./config");
 const db = require("./db/queries");
+let RiskManagement = require("metaapi.cloud-sdk").RiskManagement;
+
+const {
+  TradeShareSynchronizationListener,
+} = require("./TradeShareSynchronizationListener");
 
 //Environment variabless
 const token = process.env.ACCOUNT_TOKEN || config.accessToken;
 const port = process.env.PORT || "8000";
+
+const riskManagement = new RiskManagement(token);
+const riskManagementApi = riskManagement.riskManagementApi;
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -130,6 +138,62 @@ app.post("/register", checkIfUserExists, async (req, res) => {
         });
       }
     });
+});
+
+app.get("/stream", async (req, res) => {
+  try {
+    const account = await api.metatraderAccountApi.getAccount(
+      "be364bad-f86d-4a43-bb41-449f8595fa84"
+    );
+
+    const connection = account.getStreamingConnection();
+    const listener = new TradeShareSynchronizationListener();
+    connection.addSynchronizationListener(listener);
+    await connection.connect();
+    return res.status(400).json({
+      message: "account connected successfully...",
+    });
+  } catch (error) {
+    console.log("Error:", error);
+  }
+});
+
+app.get("/equity", async (req, res) => {
+  const accountId = req.query.accountId;
+  const startTime = req.query.startTime;
+  const endTime = req.query.endTime;
+
+  if (!accountId || !startTime || !endTime) {
+    return res.status(400).json({
+      message:
+        "Please provide all the details for equity chart",
+    });
+  }
+
+  const account = await api.metatraderAccountApi.getAccount(accountId);
+  if (!account.riskManagementApiEnabled) {
+    return res.status(400).json({
+      message:
+        "Please set riskManagementApiEnabled field to true in your MetaApi account in " +
+        "order to use it in RiskManagement API",
+    });
+  }
+
+  try {
+    const equityChart = await riskManagementApi.getEquityChart(
+      accountId,
+      startTime,
+      endTime
+    );
+    return res.status(200).json({
+      chart: equityChart,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: error,
+    });
+  }
+ 
 });
 
 app.get("/history", async (req, res) => {
