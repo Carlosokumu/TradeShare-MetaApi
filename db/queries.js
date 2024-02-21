@@ -3,12 +3,22 @@ const config = require("../config");
 
 const DB_URL = process.env.DB_URL || config.databaseUrl;
 
+// const pool = new Pool({
+
+//   connectionString: DB_URL,
+//   ssl: {
+//     rejectUnauthorized: false,
+//   },
+// });
+
+
 const pool = new Pool({
-  connectionString: DB_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
+  user: 'swingwizards_users_user',
+  host: 'dpg-clk1dveg1b2c739f9rqg-a',
+  database: 'swingwizards_users',
+  password: 'U84u2BM2lRGFIoCArcrIxtYaLQ3fhBmd',
+  port: 5432,
+})
 
 const checkUsernameExistence = (username, callback) => {
   pool.query(
