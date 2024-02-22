@@ -5,6 +5,8 @@ const config = require("./config");
 const db = require("./db/queries");
 let RiskManagement = require("metaapi.cloud-sdk").RiskManagement;
 
+let MetaStats = require("metaapi.cloud-sdk").MetaStats;
+
 const {
   TradeShareSynchronizationListener,
 } = require("./TradeShareSynchronizationListener");
@@ -15,6 +17,8 @@ const port = process.env.PORT || "8000";
 
 const riskManagement = new RiskManagement(token);
 const riskManagementApi = riskManagement.riskManagementApi;
+
+const metaStats = new MetaStats(token);
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -158,6 +162,19 @@ app.get("/stream", async (req, res) => {
   }
 });
 
+app.get("/stats", async (req, res) => {
+  try {
+    const stats = await metaStats.getMetrics(accountId);
+    return res.status(200).json({
+      stats: stats
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: error,
+    });
+  }
+});
+
 app.get("/equity", async (req, res) => {
   const accountId = req.query.accountId;
   const startTime = req.query.startTime;
@@ -165,12 +182,12 @@ app.get("/equity", async (req, res) => {
 
   if (!accountId || !startTime || !endTime) {
     return res.status(400).json({
-      message:
-        "Please provide all the details for equity chart",
+      message: "Please provide all the details for equity chart",
     });
   }
 
   const account = await api.metatraderAccountApi.getAccount(accountId);
+
   if (!account.riskManagementApiEnabled) {
     return res.status(400).json({
       message:
@@ -193,7 +210,6 @@ app.get("/equity", async (req, res) => {
       error: error,
     });
   }
- 
 });
 
 app.get("/history", async (req, res) => {
