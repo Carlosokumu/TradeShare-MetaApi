@@ -163,10 +163,16 @@ app.get("/stream", async (req, res) => {
 });
 
 app.get("/stats", async (req, res) => {
+  const accountId = req.query.accountId;
+  if (!accountId) {
+    return res.status(400).json({
+      message: "Please provide an account id ",
+    });
+  }
   try {
     const stats = await metaStats.getMetrics(accountId);
     return res.status(200).json({
-      stats: stats
+      stats: stats,
     });
   } catch (error) {
     return res.status(500).json({
