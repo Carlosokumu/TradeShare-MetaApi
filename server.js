@@ -162,7 +162,7 @@ app.get("/stream", async (req, res) => {
   }
 });
 
-app.get("/stats", async (req, res) => {
+app.get("/metrics", async (req, res) => {
   const accountId = req.query.accountId;
   if (!accountId) {
     return res.status(400).json({
