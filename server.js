@@ -229,7 +229,7 @@ app.get("/positions", async (req, res) => {
   }
   try {
     const account = await api.metatraderAccountApi.getAccount(
-      "be364bad-f86d-4a43-bb41-449f8595fa84"
+      accountId
     );
 
     const connection = account.getRPCConnection();
