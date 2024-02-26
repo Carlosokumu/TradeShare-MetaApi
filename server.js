@@ -227,6 +227,7 @@ app.get("/positions", async (req, res) => {
       positions: positions,
     });
   } catch (error) {
+    console.log("Error:",error)
     return res.status(500).json({
       error: error,
     });
