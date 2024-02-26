@@ -239,7 +239,7 @@ app.get("/positions", async (req, res) => {
 
     const positions = await connection.getPositions();
     console.log("Positions:", positions);
-    return res.status(500).json({
+    return res.status(200).json({
       positions: positions,
     });
   } catch (error) {
