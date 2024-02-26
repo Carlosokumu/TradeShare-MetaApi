@@ -221,8 +221,8 @@ app.get("/equity", async (req, res) => {
 
 app.get("/positions", async (req, res) => {
   try {
-    const positions = await api.metatraderAccountApi.getAccount(accountId)
-      .closedPositions;
+    const positions = await api.metatraderAccountApi.getAccount("be364bad-f86d-4a43-bb41-449f8595fa84")
+      .positions;
     return res.status(500).json({
       positions: positions,
     });
