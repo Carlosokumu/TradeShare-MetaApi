@@ -164,6 +164,7 @@ app.get("/stream", async (req, res) => {
 
 app.get("/metrics", async (req, res) => {
   const accountId = req.query.accountId;
+
   if (!accountId) {
     return res.status(400).json({
       message: "Please provide an account id ",
@@ -210,6 +211,20 @@ app.get("/equity", async (req, res) => {
     );
     return res.status(200).json({
       chart: equityChart,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: error,
+    });
+  }
+});
+
+app.get("/positions", async (req, res) => {
+  try {
+    const positions = await api.metatraderAccountApi.getAccount(accountId)
+      .closedPositions;
+    return res.status(500).json({
+      positions: positions,
     });
   } catch (error) {
     return res.status(500).json({
