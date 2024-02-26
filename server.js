@@ -220,14 +220,30 @@ app.get("/equity", async (req, res) => {
 });
 
 app.get("/positions", async (req, res) => {
+  const accountId = req.query.accountId;
+  if(!accountId){
+    return res.status(400).json({
+      message:
+        "Please provide the account Id to fetch positions for",
+    });
+  }
   try {
-    const positions = await api.metatraderAccountApi.getAccount("be364bad-f86d-4a43-bb41-449f8595fa84")
-      .positions;
+    const account = await api.metatraderAccountApi.getAccount(
+      "be364bad-f86d-4a43-bb41-449f8595fa84"
+    );
+
+    const connection = account.getRPCConnection();
+
+    await connection.connect();
+    await connection.waitSynchronized();
+
+    const positions = await connection.getPositions();
+    console.log("Positions:", positions);
     return res.status(500).json({
       positions: positions,
     });
   } catch (error) {
-    console.log("Error:",error)
+    console.log("Error:", error);
     return res.status(500).json({
       error: error,
     });
