@@ -221,22 +221,16 @@ app.get("/equity", async (req, res) => {
 
 app.get("/positions", async (req, res) => {
   const accountId = req.query.accountId;
-  if(!accountId){
+  if (!accountId) {
     return res.status(400).json({
-      message:
-        "Please provide the account Id to fetch positions for",
+      message: "Please provide the account Id to fetch positions for",
     });
   }
   try {
-    const account = await api.metatraderAccountApi.getAccount(
-      accountId
-    );
-
+    const account = await api.metatraderAccountApi.getAccount(accountId);
     const connection = account.getRPCConnection();
-
     await connection.connect();
     await connection.waitSynchronized();
-
     const positions = await connection.getPositions();
     console.log("Positions:", positions);
     return res.status(200).json({
@@ -255,37 +249,45 @@ app.get("/history", async (req, res) => {
   const currentDate = new Date();
   let startTime, endTime;
   const trades = [];
+
   if (!account_id || !history_range) {
     return res.status(400).json({
       message: "account_id or history range parameter are required",
     });
   }
+
   switch (parseInt(history_range)) {
-    case TODAY: // Last 24 hours
+    case TODAY: // Today
       startTime = new Date(currentDate);
-      startTime.setHours(currentDate.getHours() - 24);
-      endTime = new Date();
+      startTime.setHours(0, 0, 0, 0);
+      endTime = new Date(currentDate);
+      endTime.setHours(23, 59, 59, 999);
       break;
     case WEEK: // Last 7 days (a week)
-      startTime = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-      endTime = new Date();
+      startTime = new Date(currentDate);
+      startTime.setDate(currentDate.getDate() - 7);
+      startTime.setHours(0, 0, 0, 0);
+      endTime = new Date(currentDate);
+      endTime.setHours(23, 59, 59, 999);
       break;
     case MONTH: // Last 30 days (a month)
-      startTime = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-      endTime = new Date();
+      startTime = new Date(currentDate);
+      startTime.setDate(currentDate.getDate() - 30);
+      startTime.setHours(0, 0, 0, 0);
+      endTime = new Date(currentDate);
+      endTime.setHours(23, 59, 59, 999);
       break;
     default:
       return res.status(400).json({
         message: "Invalid history range parameter",
       });
-    //   TODO: Implement cases where a custom period can be used to filter historical trades
+    // TODO: Implement cases where a custom period can be used to filter historical trades
   }
   try {
     const account = await api.metatraderAccountApi.getAccount(account_id);
     const connection = account.getRPCConnection();
     await connection.connect();
     await connection.waitSynchronized();
-    connection.getCo;
     const orders = await connection.getHistoryOrdersByTimeRange(
       startTime,
       endTime,
