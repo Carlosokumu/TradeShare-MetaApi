@@ -1,12 +1,11 @@
 const Pool = require("pg").Pool;
 const config = require("../config");
 
-
-const user = process.env.USER;
-const host = process.env.HOST;
-const database = process.env.DB;
-const password = process.env.PASSWORD;
-const port = process.env.DB_PORT;
+const user = process.env.USER || config.user;
+const host = process.env.HOST || config.host;
+const database = process.env.DB || config.database;
+const password = process.env.PASSWORD || config.password;
+const port = process.env.DB_PORT || config.port;
 
 const pool = new Pool({
   user: user,
@@ -14,6 +13,7 @@ const pool = new Pool({
   database: database,
   password: password,
   port: port,
+  ssl: true,
 });
 
 const checkUsernameExistence = (username, callback) => {
