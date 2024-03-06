@@ -126,11 +126,38 @@ const getAccountHistoricalTrades = asyncHandler(async (req, res, next) => {
       trades: trades.sort((a, b) => Date.parse(b.time) - Date.parse(a.time)),
     });
   } catch (error) {
-    console.log("Error", error);
-    if (error.message) {
-      return next(new ErrorResponse(error.message, error.status));
+    if (error.details) {
+      // returned if the server file for the specified server name has not been found
+      // recommended to check the server name or create the account using a provisioning profile
+      if (error.details === "E_SRV_NOT_FOUND") {
+        console.log(error);
+        return next(new ErrorResponse("Broker Server  not found", 404));
+      }
+      // returned if the server has failed to connect to the broker using your credentials
+      // recommended to check your login and password
+      else if (error.details === "E_AUTH") {
+        console.log(error);
+        return next(
+          new ErrorResponse(
+            "Failed to connect to your broker.Please check your login and password and try again",
+            401
+          )
+        );
+      }
+      // returned if the server has failed to detect the broker settings
+      // recommended to try again later or create the account using a provisioning profile
+      else if (error.details === "E_SERVER_TIMEZONE") {
+        console.log(error);
+        return next(new ErrorResponse(error, 400));
+      } else {
+        return next(new ErrorResponse(error.details[0].message, error.status));
+      }
     } else {
-      return next(new ErrorResponse(error.message, error));
+      if (error.message) {
+        return next(new ErrorResponse(error.message, error.status));
+      } else {
+        return next(new ErrorResponse(error.message, error));
+      }
     }
   }
 });
