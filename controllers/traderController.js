@@ -39,8 +39,9 @@ const registerTrader = asyncHandler(async (req, res, next) => {
               if (error) {
                 throw error;
               } else {
-                return res.status(200).json({
-                  deployed_account: account._data,
+                res.status(200).json({
+                  success: false,
+                  data: { deployed_account: account._data },
                 });
               }
             });
