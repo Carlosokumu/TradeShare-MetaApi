@@ -5,6 +5,23 @@ const api = new MetaApi(token);
 const db = require("../db/queries");
 const asyncHandler = require("../middlewares/asyncHandler");
 const ErrorResponse = require("../utils/ErrorResponse");
+const axios = require("axios");
+
+async function connectTradingAccount(username, accountId, platform) {
+  try {
+    await axios.patch(
+      "https://tradesharebackend-xuqcyp00.b4a.run/tradex/user/tradingaccount",
+      {
+        platform: platform,
+        account_id: accountId,
+        username: username,
+      }
+    );
+  } catch (error) {
+    // Handle errors
+    console.error("Error:", error.message);
+  }
+}
 
 const registerTrader = asyncHandler(async (req, res, next) => {
   const { name, login, platform, password, server } = req.body;
@@ -35,15 +52,10 @@ const registerTrader = asyncHandler(async (req, res, next) => {
           })
           .then((account) => {
             //Update TradeShare database  with metaapi accountId after successully connecting the trading account
-            db.updateUserAccountId(account._data._id, name, (error) => {
-              if (error) {
-                throw error;
-              } else {
-                res.status(200).json({
-                  success: false,
-                  data: { deployed_account: account._data },
-                });
-              }
+            connectTradingAccount(name, account._data._id, platform);
+            res.status(200).json({
+              success: false,
+              data: { deployed_account: account._data },
             });
           })
           .catch((error) => {
