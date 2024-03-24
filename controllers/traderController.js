@@ -7,7 +7,17 @@ const asyncHandler = require("../middlewares/asyncHandler");
 const ErrorResponse = require("../utils/ErrorResponse");
 const axios = require("axios");
 
-async function connectTradingAccount(username, accountId, platform) {
+async function connectTradingAccount(
+  username,
+  accountId,
+  platform,
+  accessToken
+) {
+  const headers = {
+    Authorization: `Bearer ${accessToken}`,
+    "Content-Type": "application/json",
+  };
+
   try {
     await axios.patch(
       "https://tradesharebackend-xuqcyp00.b4a.run/tradex/user/tradingaccount",
@@ -15,18 +25,20 @@ async function connectTradingAccount(username, accountId, platform) {
         platform: platform,
         account_id: accountId,
         username: username,
-      }
+      },
+      { headers: headers } 
     );
   } catch (error) {
     // Handle errors
     console.error("Error:", error.message);
+    new ErrorResponse(error.message, 500)
   }
 }
 
 const registerTrader = asyncHandler(async (req, res, next) => {
-  const { name, login, platform, password, server } = req.body;
+  const { name, login, platform, password, server,token } = req.body;
 
-  if (!name || !login || !platform || !password || !server) {
+  if (!name || !login || !platform || !password || !server || !token) {
     return next(
       new ErrorResponse("Please provide all the required fields", 400)
     );
@@ -52,7 +64,8 @@ const registerTrader = asyncHandler(async (req, res, next) => {
           })
           .then((account) => {
             //Update TradeShare database  with metaapi accountId after successully connecting the trading account
-            connectTradingAccount(name, account._data._id, platform);
+            connectTradingAccount(name, account._data._id, platform,token);
+
             res.status(200).json({
               success: false,
               data: { deployed_account: account._data },
