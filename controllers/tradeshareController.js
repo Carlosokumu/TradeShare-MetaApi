@@ -1,5 +1,6 @@
 let MetaApi = require("metaapi.cloud-sdk").default;
 const config = require("../config");
+const axios = require("axios");
 const token = process.env.ACCOUNT_TOKEN || config.accessToken;
 const ErrorResponse = require("../utils/ErrorResponse");
 let MetaStats = require("metaapi.cloud-sdk").MetaStats;
@@ -87,6 +88,8 @@ const getAccountHistoricalTrades = asyncHandler(async (req, res, next) => {
       oneMonthAgo.setHours(oneMonthAgo.getHours() + 3);
       startDate = oneMonthAgo;
       break;
+    default:
+      return next(new ErrorResponse("Invalid history rage ", 400));
   }
 
   try {
