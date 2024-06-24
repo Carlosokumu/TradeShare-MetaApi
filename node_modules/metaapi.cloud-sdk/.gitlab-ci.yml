@@ -1,0 +1,16 @@
+stages:
+  - build
+
+build:
+  image: node:10
+  stage: build
+  artifacts:
+    paths:
+      - dist
+  script:
+    - export SERVER=ICMarketsSC-Demo
+    - export PATH_TO_SERVERS_DAT=./lib/integration-tests/files/servers.dat
+    - npm install
+    - npm run test
+    - npm run lint
+    - npm run build
