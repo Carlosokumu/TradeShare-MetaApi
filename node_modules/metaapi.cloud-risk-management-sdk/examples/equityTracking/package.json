@@ -1,9 +1,0 @@
-{
-  "name": "examples",
-  "description": "Risk management sdk example scripts",
-  "version": "1.0.0",
-  "dependencies": {
-    "metaapi.cloud-sdk": "^19.5.0"
-  },
-  "scripts": {}
-}
