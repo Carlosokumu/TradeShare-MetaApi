@@ -31,6 +31,21 @@ const checkUsernameExistence = (username, callback) => {
   );
 };
 
+const searchServerName = (query, callback) => {
+  const searchQuery = `%${query}%`; // partial matching
+  pool.query(
+    "SELECT * FROM servers WHERE name LIKE $1",
+    [searchQuery],
+    (error, results) => {
+      if (error) {
+        callback(error, null);
+        return;
+      }
+      callback(null, results.rows);
+    }
+  );
+};
+
 const updateUserAccountId = (accountId, username, callback) => {
   console.log("Username:", username);
   pool.query(
@@ -51,4 +66,5 @@ const updateUserAccountId = (accountId, username, callback) => {
 module.exports = {
   updateUserAccountId,
   checkUsernameExistence,
+  searchServerName,
 };
