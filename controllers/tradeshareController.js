@@ -1,11 +1,26 @@
 let MetaApi = require("metaapi.cloud-sdk").default;
-const config = require("../config");
+
+const isProduction = process.env.NODE_ENV === "production";
+
+let config;
+if (!isProduction) {
+  try {
+    config = require("../config");
+  } catch (error) {
+    console.error(
+      "Failed to load config file (expected in development only):",
+      error
+    );
+  }
+}
+
 const axios = require("axios");
 const token = process.env.ACCOUNT_TOKEN || config.accessToken;
 const ErrorResponse = require("../utils/ErrorResponse");
 let MetaStats = require("metaapi.cloud-sdk").MetaStats;
 const asyncHandler = require("../middlewares/asyncHandler");
 const getTimeDifference = require("../utils/TimeUtil");
+const db = require("../db/queries");
 
 const metaStats = new MetaStats(token);
 const api = new MetaApi(token);
@@ -13,6 +28,7 @@ const api = new MetaApi(token);
 const TODAY = 1;
 const WEEK = 2;
 const MONTH = 3;
+const OVER_MONTH = 4;
 const DEFAULT_OFFSET = 0;
 const DEFAULT_LIMIT = 20;
 
@@ -49,6 +65,18 @@ const getAccountOpenPositions = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(error, 500));
   }
 });
+
+const searchServerName = (req, res, next) => {
+  const query = req.query.name;
+  db.searchServerName(query, (error, results) => {
+    if (error != null) {
+      return next(new ErrorResponse(error, 500));
+    }
+    return res.status(200).json({
+      servers: results,
+    });
+  });
+};
 
 const getAccountHistoricalTrades = asyncHandler(async (req, res, next) => {
   const { account_id, history_range, offset } = req.query;
@@ -87,6 +115,14 @@ const getAccountHistoricalTrades = asyncHandler(async (req, res, next) => {
       oneMonthAgo.setHours(0, 0, 0, 0);
       oneMonthAgo.setHours(oneMonthAgo.getHours() + 3);
       startDate = oneMonthAgo;
+      break;
+    case OVER_MONTH:
+      const oneMonthAgo2 = new Date(currentDate);
+      oneMonthAgo2.setMonth(oneMonthAgo2.getMonth() - 3);
+      oneMonthAgo2.setHours(0, 0, 0, 0);
+      oneMonthAgo2.setHours(oneMonthAgo2.getHours() + 3);
+      startDate = oneMonthAgo2;
+      console.log("Datebehind:", startDate);
       break;
     default:
       return next(new ErrorResponse("Invalid history rage ", 400));
@@ -169,4 +205,5 @@ module.exports = {
   getAccountEquityChart,
   getAccountOpenPositions,
   getAccountHistoricalTrades,
+  searchServerName,
 };

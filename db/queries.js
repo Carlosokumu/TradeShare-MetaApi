@@ -1,5 +1,18 @@
 const Pool = require("pg").Pool;
-const config = require("../config");
+
+const isProduction = process.env.NODE_ENV === "production";
+
+let config;
+if (!isProduction) {
+  try {
+    config = require("../config");
+  } catch (error) {
+    console.error(
+      "Failed to load config file (expected in development only):",
+      error
+    );
+  }
+}
 
 const user = process.env.USER || config.user;
 const host = process.env.HOST || config.host;

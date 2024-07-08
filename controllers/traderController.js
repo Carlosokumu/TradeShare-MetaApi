@@ -1,5 +1,15 @@
 let MetaApi = require("metaapi.cloud-sdk").default;
-const config = require("../config");
+const isProduction = process.env.NODE_ENV === 'production';
+
+let config;
+if (!isProduction) {
+  try {
+    config = require("../config");
+  } catch (error) {
+    console.error("Failed to load config file (expected in development only):", error);
+  }
+}
+
 const token = process.env.ACCOUNT_TOKEN || config.accessToken;
 const api = new MetaApi(token);
 const db = require("../db/queries");
