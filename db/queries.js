@@ -1,24 +1,12 @@
 const Pool = require("pg").Pool;
 
-const isProduction = process.env.NODE_ENV === "production";
 
-let config;
-if (!isProduction) {
-  try {
-    config = require("../config");
-  } catch (error) {
-    console.error(
-      "Failed to load config file (expected in development only):",
-      error
-    );
-  }
-}
 
-const user = process.env.USER || config.user;
-const host = process.env.HOST || config.host;
-const database = process.env.DB || config.database;
-const password = process.env.PASSWORD || config.password;
-const port = process.env.DB_PORT || config.port;
+const user = process.env.USER 
+const host = process.env.HOST 
+const password = process.env.PASSWORD 
+const database = process.env.DB
+const port = process.env.DB_PORT
 
 const pool = new Pool({
   user: user,
