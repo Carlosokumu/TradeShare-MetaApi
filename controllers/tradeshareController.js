@@ -1,21 +1,7 @@
 let MetaApi = require("metaapi.cloud-sdk").default;
 
-const isProduction = process.env.NODE_ENV === "production";
 
-let config;
-if (!isProduction) {
-  try {
-    config = require("../config");
-  } catch (error) {
-    console.error(
-      "Failed to load config file (expected in development only):",
-      error
-    );
-  }
-}
-
-const axios = require("axios");
-const token = process.env.ACCOUNT_TOKEN || config.accessToken;
+const token = process.env.ACCOUNT_TOKEN
 const ErrorResponse = require("../utils/ErrorResponse");
 let MetaStats = require("metaapi.cloud-sdk").MetaStats;
 const asyncHandler = require("../middlewares/asyncHandler");
